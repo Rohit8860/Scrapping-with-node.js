@@ -1,0 +1,79 @@
+import axios  from "axios";
+import cheerio from "cheerio";
+import xlsx from 'xlsx';
+
+
+// const keys = ['a', 'b', 'c'];
+// const values = [1, 2, 3];
+// const dict = Object.fromEntries(keys.map((key, index) => [key, values[index]]));
+
+// let cookie = {'a':2,'b':3};
+// let row = {'a':1,'b':2,'c':3,'d':4};
+
+// // Update the 'cookie' object with the properties from the 'row' object
+// Object.assign(cookie, row);
+
+// console.log(cookie); // Output: { a: 1, b: 2, c: 3, d: 4 }
+
+
+const workbook = xlsx.utils.book_new();
+const product = [];
+const set_cookie = {};
+
+const cookies = {
+    'xY78HjU!!6S_4tHY': 'eyJpdiI6InlsYjc3SGRGeW05TVh0aDFwUjU1SlE9PSIsInZhbHVlIjoia00xVVk4eDZhaVJQMEdVV095dEJGV3RObVQ3UXpDR0FqdUZlOWgyRG1UTXU5YlJOM0k1L0c4UmZPRHNYOVcyRG5nUnhzRzJiMTY3WEFvVW5Ra2c1NWxGeXJ3RzdGN3psd3ppcEZBWTZSVms9IiwibWFjIjoiYjZiMzJjYjA5ZjdmZmU1MDUxNjE3MjBiZTg4Njk1ZDVmNzY0MDk0ZTNhOTk5MzRmYzkxODIzM2RlYjZjZjQ3MiIsInRhZyI6IiJ9',
+    'XSRF-TOKEN': 'eyJpdiI6IjVaNzJEaTd1YzJabVRqUFBQZE9BTnc9PSIsInZhbHVlIjoiR083SWhiL2NEQTcxaVp5WUwwSWFmN2g3SFBYMWdSaWNucmNQK1diRW96RkdYVlRlVHB4SmtMSnI3UExtd1JzZ2dUOC9wTGxsVC9nRWkwbFpwOWxidnBvc0hCUTBXSXFWMXNEaXBqK1JJb09Ea1JGK2ZucU93VXhuKzNjdkI3WXQiLCJtYWMiOiJmMWM5YTlhNWM1NTI1OWZmMGIyYmM3OTkxYzdmYWM0MWVlMzNjYWZhNjQ0MTFmZjY0MDA4NWQ2N2Q0YjZmOTc0IiwidGFnIjoiIn0%3D',
+    'ticket_works_b2b_session': 'eyJpdiI6IkJ4YlNpcWJiemdVaW9LR3BEeTRWaXc9PSIsInZhbHVlIjoieWlpTzEvRjBDTWZQUW52S0JsQ04zUkpkWnYwV2JHTHV6L2NLV0RVYWUxSStRY3V3Sk1helgyeEY2MmI0eCsvZmNWUHlKeWZ3cFlFL3ZLQUxJR0xWNWR4NW9WVUxydjR5RUFXWGpvVVVRL2ppZ1Z4L2c3R0g4YTVmUnFEcHBHTVEiLCJtYWMiOiIwYmZmMDZiYzIwZDBhMjk2MjBjODlhYzhiNGZhYzdmNjM5MWMyNGMyZWI0N2RhMGJlNDhmYmE0ZjY0YmZiYWEzIiwidGFnIjoiIn0%3D',
+    '__stripe_mid': 'f3d242d8-cfc0-4bff-8624-eff30e348e4e83f0d7',
+    '__stripe_sid': '7ad4eb7d-dcdd-4bb0-8e32-3ef00b950e1598e696',
+}
+
+
+var headers = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:126.0) Gecko/20100101 Firefox/126.0',
+    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+    'Accept-Language': 'en-US,en;q=0.5',
+    'Accept-Encoding': 'gzip, deflate, br, zstd',
+    'Referer': 'https://www.travelconnectionleisure.com/en/s/football?team%5B%5D=1143',
+    'Connection': 'keep-alive',
+    'Upgrade-Insecure-Requests': '1',
+    'Sec-Fetch-Dest': 'document',
+    'Sec-Fetch-Mode': 'navigate',
+    'Sec-Fetch-Site': 'same-origin',
+    'Sec-Fetch-User': '?1',
+    'Priority': 'u=1'
+  }
+
+async function cookie_update(cookiee){  // response headers.set_cookie making key and value and update to main cookies
+    cookiee.forEach(Element => {
+        const keyValue = Element.split(";")[0];
+        const key = keyValue.split("=")[0];
+        const value = keyValue.split("=")[1];
+        console.log(`${key} : ${value}`);
+        const keys = key.split(",");
+        const values = value.split(",");
+        const dict = Object.fromEntries(keys.map((k, index) => [k, values[index]]));
+        Object.assign(cookies, dict);
+      });
+
+}
+
+
+async function test(){
+  try{
+      const response = await axios.get('https://www.travelconnectionleisure.com/en/s/english-football/matches',{
+          headers:headers,
+          cookies:cookies
+      })
+      console.log(response.status)
+      console.log(response.headers['set-cookie'])
+      const cookie = response.headers['set-cookie'];
+      cookie_update(cookie)
+      console.log(cookies)
+
+  } catch (error){
+      console.error('Error making GET request:', error)
+  }
+}
+
+test();
